@@ -4,6 +4,9 @@ fichier = open('ressources/test.txt', "r")
 
 
 tableau =[[],[]]
+a=1
+b=1
+
 
 def lire_fichier(fichier):
     global tableau
@@ -78,43 +81,45 @@ def odonneeOrigine(x,y):
 lire_fichier(fichier)
 a = covarience(tableau[0],tableau[1])/variance(tableau[0])
 b=odonneeOrigine(tableau[0],tableau[1])
-print(b)
 print(a)
+print(b)
 
-#a refaire
-# def derivéA(x,y,a,b):
-#     sommeX=0
-#     sommeXY=0
-#     sommeXX=0
-#     for i in range(len(x)):
-#         sommeX=sommeX+x[i]
-#         sommeXY=sommeXY+x[i]*y[i]
-#         sommeXX=sommeXX+x[i]*x[i]
-#     a=2*(sommeXX+b*sommeX-sommeXY)
-#     return a
 
-# def derivéB(x,y,a,b):
-#     sommeX=0
-#     sommeY=0
-#     sommeXY=0
-#     sommeXX=0
-#     for i in range(len(x)):
-#         sommeX=sommeX+x[i]
-#         sommeY=sommeY+y[i]
-#         sommeXY=sommeXY+x[i]*y[i]
-#         sommeXX=sommeXX+x[i]*x[i]
-#     be=2(a*sommeX+len(x)*b-sommeY)
-#     return be
+def deriveePartielleA(a,b,x,y):
+    sommeXX=0
+    for i in range(len(x)):
+        sommeXX=sommeXX+x[i]*x[i]
+    sommeX=0
+    for i in range(len(x)):
+        sommeX=sommeX+x[i]
+    sommeXY=0
+    for i in range(len(x)):
+        sommeXY=sommeXY+x[i]*y[i]
+    resultat=0
+    resultat=2*(a*sommeXX+b*sommeX-sommeXY)
+    return resultat
 
-# def gradient(x,y,a,b):
-#     for i in range(100):
-#         a=a-0.0001*derivéA(x,y,a,b)
-#         b=b-0.0001*derivéB(x,y,a,b)
-#     return a,b
+def deriveePartielleB(a,b,x,y):
+    sommeX=0
+    for i in range(len(x)):
+        sommeX=sommeX+x[i]
+    sommeY=0
+    for i in range(len(y)):
+        sommeY=sommeY+y[i]
+    resultat=0
+    resultat=2*(a*sommeX+b*len(x)-sommeY)   
+    return resultat
+def gradient(a,b,x,y):
+    while(deriveePartielleA(a,b,x,y)<=0.00001 and deriveePartielleB(a,b,x,y)<=0.0001):
+        res1=deriveePartielleA(a,b,x,y)
+        res2=deriveePartielleB(a,b,x,y)
+        a=a-res1*0.0001
+        b=b-res2*0.0001
 
-# a,b=gradient(tableau[0],tableau[1],1,2)
-# print(a)
-# print(b)
+    return a,b
+print("methode gradient")
+print(gradient(a,b,tableau[0],tableau[1]))
+
     
 
 
