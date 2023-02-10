@@ -1,5 +1,3 @@
-
-
 fichier = open('ressources/test.txt', "r")
 
 
@@ -40,7 +38,7 @@ def moyenne_xy(x,y):
            
 
 #calculer covarience de x et y 
-def covarience(x,y):
+def covariance(x,y):
     moyenne_x=0
     moyenne_y=0
     for i in range(len(x)):
@@ -79,7 +77,7 @@ def odonneeOrigine(x,y):
     return b
 
 lire_fichier(fichier)
-a = covarience(tableau[0],tableau[1])/variance(tableau[0])
+a = covariance(tableau[0],tableau[1])/variance(tableau[0])
 b=odonneeOrigine(tableau[0],tableau[1])
 print(a)
 print(b)
@@ -109,12 +107,20 @@ def deriveePartielleB(a,b,x,y):
     resultat=0
     resultat=2*(a*sommeX+b*len(x)-sommeY)   
     return resultat
+    
+a=1
+b=1
 def gradient(a,b,x,y):
-    while(deriveePartielleA(a,b,x,y)<=0.00001 and deriveePartielleB(a,b,x,y)<=0.0001):
+    notFini = True
+    while(notFini):
+        if(abs(deriveePartielleA(a,b,x,y))<=0.0001 and abs(deriveePartielleB(a,b,x,y)<=0.0001)):
+            notFini = False
+        
         res1=deriveePartielleA(a,b,x,y)
         res2=deriveePartielleB(a,b,x,y)
-        a=a-res1*0.0001
-        b=b-res2*0.0001
+        a=a-res1*0.00001
+        b=b-res2*0.00001
+
 
     return a,b
 print("methode gradient")
