@@ -16,8 +16,11 @@ def lire_fichier(path):
         for digit in tab:
             if(not digit.isdigit()):
                 for char in digit:
-                    if(not char.isdigit()):
-                        digit.replace(char,".")
+                    if(char.isalpha()):
+                        raise Exception("Erreur de formatage du fichier de test")
+                    if(char == "," or char == ";"):
+                        digit = digit.replace(char,".")
+                        
             if(compteur == 0):
                 tableau[0].append(float(digit))
                 compteur += 1
@@ -67,17 +70,12 @@ def gradient(varList1,varList2):
         b=b-res2*0.0001
     return a,b
 
-lire_fichier('ressources/test.txt')
-a = covarience(tableau[0],tableau[1]) / variance(tableau[0])
-b = odonneeOrigine(tableau[0],tableau[1])
-print(a)
-print(b)
+
 
 
 
     
-a=1
-b=1
+
 def gradient(a,b,x,y):
     notFini = True
     while(notFini):
@@ -91,5 +89,16 @@ def gradient(a,b,x,y):
 
 
     return a,b
-print("methode gradient")
-print(gradient(tableau[0],tableau[1]))
+try:
+    lire_fichier('ressources/test.txt')
+    a = covarience(tableau[0],tableau[1]) / variance(tableau[0])
+    b = odonneeOrigine(tableau[0],tableau[1])
+    print(a)
+    print(b)
+    a=1
+    b=1
+    print("methode gradient")
+    print(gradient(a,b,tableau[0],tableau[1]))
+except Exception as e:
+    print(e)
+
