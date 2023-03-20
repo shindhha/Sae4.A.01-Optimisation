@@ -58,30 +58,47 @@ def deriveePartielleA(a,b,sommeProdXX,sommeProdXY,sumX):
     return 2 * (a * sommeProdXX + b * sumX - sommeProdXY)
 def deriveePartielleB(a,b,sumX,sumY,length):
     return 2 * (a * sumX + b * length - sumY)
-def F(sommeProdYY,sommeProdXY,sommeProdXX,a,b,length,sumY,sumX):
+def cout(sommeProdYY,sommeProdXY,sommeProdXX,a,b,length,sumY,sumX):
     return sommeProdYY - 2 * a * sommeProdXY - 2 * b * sumY + a * a * sommeProdXX + 2 * a * b * sumX + length * b * b
-def gradient(sumX,sumY,length,sommeProdXX,sommeProdXY,a = 1,b = 1,err = 0.001,pas = 1):
-    i = 0
-    fini = False
+"""
+:param sumX: Somme des surfaces d'appartement
+:param sumY: Somme des prix d'appartement
+:param length: longueur des données
+:param sommeProdXX: Somme des produits surfaces * surfaces
+:param sommeProdXY: Somme des produits srufaces * prix
+:param a: 'a' de départ
+:param b: 'b' de départ
+:param precision: précision souhaiter pour la condition d'arret
+:param pas: vitesse d'apprentissage du modèles initiale
+"""
+def gradient(sumX,sumY,length,sommeProdXX,sommeProdXY,a = 1,b = 1,precision = 0.001,pas = 1):
+    descenteFini = False
+    nbIteration = 0
+    maxIteration = 1e9
     devA = deriveePartielleA(a,b,sommeProdXX,sommeProdXY,sumX)
     devB = deriveePartielleB(a,b,sumX,sumY,length)
-    while(not fini and i < 1e9):
-        if(abs(devA) <= err and abs(devB) <= err):
-            fini = True
+    while(not descenteFini and nbIteration < maxIteration):
+        nbIteration += 1
+        # Quand les dérivée arrivent en dessous de la précision souhaiter
+        # On arrete la descente de gradient.
+        if(abs(devA) <= precision and abs(devB) <= precision):
+            descenteFini = True
         a -= devA * pas
         b -= devB * pas
-        i += 1
         newDevA = deriveePartielleA(a,b,sommeProdXX,sommeProdXY,sumX)
         newDevB = deriveePartielleB(a,b,sumX,sumY,length)
-        if ( -10 > abs(devA) - abs(newDevA) or -10 > abs(devB) - abs(newDevB)):
+        # Si la distance a 0 de la nouvelle dérivée est plus grande que l'ancienne.
+        # Alors cela traduit une erreur dans le modèles.
+        # Donc on réduit le pas.
+        if (-10 > abs(devA) - abs(newDevA) or -10 > abs(devB) - abs(newDevB)):
             pas /= 100
-        if (i % 10 == 0):
+
+        # On augmente le pas régulièrement pour accélérer la descente de gradient.
+        if (nbIteration % 10 == 0):
             pas *= 3
-        if (i % 10000 == 0):
-            print(newDevA,newDevB,pas)
         devA = newDevA
         devB = newDevB
-    return a,b,i
+    return a,b,nbIteration
 
 def methodeAnalytique(tableau):
     a = covarience(tableau[0],tableau[1]) / variance(tableau[0])
@@ -274,15 +291,6 @@ class Application(tk.Frame):
 
     def getAnalytique(self):
         return self.aAnalytique,self.bAnalytique
-
-
-        # TODO Permettre a l'utilisateur de changer les parametre
-        # de la methode gradient (pas , err , a , b)
-        # TODO changer les "Entry du tableau de stat pour quelque chose de non modifiable par l'utilisateur"
-        # TODO Améliorer l'ergonomie de l'application
-        # TODO Améliorer la qualité du code (séparer les responsabilitées avec d'autre objets)
-        # TODO Simulation jeu de données
-
 
 
 try:
