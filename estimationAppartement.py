@@ -37,12 +37,8 @@ def mediane(varList):
     return mediane
 def etendue(varList):
     return max(varList) - min(varList)
-
 def coef_correlation_lineaire(donnees):
-    return covarience(donnees[0],donnees[1]) / math.sqrt(variance(donnees[0])) * math.sqrt(variance(donnees[1]))
-
-    
-
+    return covarience(donnees[0],donnees[1]) / (math.sqrt(variance(donnees[0])) * math.sqrt(variance(donnees[1])))
 def moyenne(varList):
     return sum(varList) / len(varList)
 def sommeProd(varList1,varList2):
@@ -64,12 +60,12 @@ def deriveePartielleB(a,b,sumX,sumY,length):
     return 2 * (a * sumX + b * length - sumY)
 def F(sommeProdYY,sommeProdXY,sommeProdXX,a,b,length,sumY,sumX):
     return sommeProdYY - 2 * a * sommeProdXY - 2 * b * sumY + a * a * sommeProdXX + 2 * a * b * sumX + length * b * b
-def gradient(sumX,sumY,length,sommeProdXX,sommeProdXY,a = 1,b = 1,err = 0.001,pas = 0.1):
+def gradient(sumX,sumY,length,sommeProdXX,sommeProdXY,a = 1,b = 1,err = 0.001,pas = 1):
     i = 0
     fini = False
     devA = deriveePartielleA(a,b,sommeProdXX,sommeProdXY,sumX)
     devB = deriveePartielleB(a,b,sumX,sumY,length)
-    while(not fini):
+    while(not fini and i < 1e9):
         if(abs(devA) <= err and abs(devB) <= err):
             fini = True
         a -= devA * pas
@@ -78,10 +74,15 @@ def gradient(sumX,sumY,length,sommeProdXX,sommeProdXY,a = 1,b = 1,err = 0.001,pa
         newDevA = deriveePartielleA(a,b,sommeProdXX,sommeProdXY,sumX)
         newDevB = deriveePartielleB(a,b,sumX,sumY,length)
         if ( -10 > abs(devA) - abs(newDevA) or -10 > abs(devB) - abs(newDevB)):
-            pas *= 0.1
+            pas /= 100
+        if (i % 10 == 0):
+            pas *= 3
+        if (i % 10000 == 0):
+            print(newDevA,newDevB,pas)
         devA = newDevA
         devB = newDevB
     return a,b,i
+
 def methodeAnalytique(tableau):
     a = covarience(tableau[0],tableau[1]) / variance(tableau[0])
     return a,odonneeOrigine(a,tableau[0],tableau[1])
@@ -166,8 +167,9 @@ class Application(tk.Frame):
         btn.pack()
 
     def calculer(self):
+        (self.aAnalytique,self.bAnalytique) = methodeAnalytique(self.tableau)     
+        print(self.aAnalytique,self.bAnalytique)
         (self.aGradient,self.bGradient,self.nbIteration) = gradient(self.sumX,self.sumY,self.length,self.sommeProdXX,self.sommeProdXY)
-        (self.aAnalytique,self.bAnalytique) = methodeAnalytique(self.tableau)        
 
     def afficherFenetreStatistique(self):
         secondFrame = tk.Tk()
@@ -223,7 +225,7 @@ class Application(tk.Frame):
         plot1.scatter(self.tableau[0],self.tableau[1])
         plot1.plot(axeX,axeYGradient,color='red')
         plot1.plot(axeX,axeYAnalytique,color='green')
-        canvas = mpl.FigureCanvasTkAgg(fig,master=middle_column)  
+        canvas = FigureCanvasTkAgg(fig,master=middle_column)  
         canvas.draw()
         canvas.get_tk_widget().pack()
 
