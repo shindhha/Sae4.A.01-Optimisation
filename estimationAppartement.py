@@ -131,10 +131,10 @@ class Application(tk.Frame):
         self.create_widgets(self.left_column)
 
     def create_widgets(self,parentFrame):
-        self.createBtn("Calculer",self.calculer,parentFrame)
-        self.createBtn("Afficher les statistique",self.afficherFenetreStatistique,parentFrame)
-        self.createBtn("QUIT",self.master.destroy,parentFrame)
-        self.createBtn("Estimer un appartement",self.afficherFenetreEstimation,parentFrame)
+        self.calc = self.createBtn("Calculer",self.calculer,parentFrame,"disabled")
+        self.stat = self.createBtn("Afficher les statistique",self.afficherFenetreStatistique,parentFrame,"disabled")
+        self.quitter = self.createBtn("QUIT",self.master.destroy,parentFrame,"normal")
+        self.estime = self.createBtn("Estimer un appartement",self.afficherFenetreEstimation,parentFrame,"disabled")
         errEntry = tk.Entry(parentFrame,text="Erreur autoriser : ")
         pas = tk.Entry(parentFrame,text="Vitesse d'apprentissage (pas) : ")
 
@@ -160,16 +160,19 @@ class Application(tk.Frame):
         label.pack()
         return label
 
-    def createBtn(self,title,command,parentFrame):
+    def createBtn(self,title,command,parentFrame,state):
         btn = tk.Button(parentFrame)
         btn["text"] = title
         btn["command"] = command
+        btn["state"] = state
         btn.pack()
-
+        return btn
     def calculer(self):
         (self.aAnalytique,self.bAnalytique) = methodeAnalytique(self.tableau)     
         print(self.aAnalytique,self.bAnalytique)
         (self.aGradient,self.bGradient,self.nbIteration) = gradient(self.sumX,self.sumY,self.length,self.sommeProdXX,self.sommeProdXY)
+        self.calc["state"] = "disabled"
+        self.stat["state"] = "normal"
 
     def afficherFenetreStatistique(self):
         secondFrame = tk.Tk()
@@ -193,16 +196,24 @@ class Application(tk.Frame):
         self.e = tk.Entry(frame)
         self.e.grid(row=0,column=1)
         self.e.insert(tk.END,"Surface")
-
+        self.e["state"] = "disabled"
+        self.e["disabledbackground"] = "white"
+        self.e["disabledforeground"] = "black"
         self.e = tk.Entry(frame)
         self.e.grid(row=0,column=2)
         self.e.insert(tk.END,"Prix")
+        self.e["state"] = "disabled"
+        self.e["disabledbackground"] = "white"
+        self.e["disabledforeground"] = "black"
         for i in range(1,len(self.tabStat)):
             for j in range(len(self.tabStat[0])):
                  
                 self.e = tk.Entry(frame)
                 self.e.grid(row=i, column=j)
                 self.e.insert(tk.END, self.tabStat[i][j])
+                self.e["state"] = "disabled"
+                self.e["disabledbackground"] = "white"
+                self.e["disabledforeground"] = "black" 
         frame.pack()
 
         
@@ -239,8 +250,17 @@ class Application(tk.Frame):
             self.text.delete("1.0","end")
             self.text.insert(tk.END, content)
             file.close()
-            self.tableau = lire_fichier(file.name)
-            self.initStat(self.tableau)
+            try:
+                self.tableau = lire_fichier(file.name)
+                self.initStat(self.tableau)
+                self.calc["state"] = tk.NORMAL
+                self.estime["state"] = tk.NORMAL
+                self.stat["state"]= tk.DISABLED
+            except Exception as e:
+                self.calc["state"] = tk.DISABLED
+                self.stat["state"] = tk.DISABLED
+                self.estime["state"] = tk.DISABLED
+            
 
     def save_file(self):
         file = tk.filedialog.asksaveasfile(mode="w")
